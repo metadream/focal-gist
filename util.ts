@@ -9,14 +9,15 @@
  */
 export function uniqueId(length = 21): string {
     // DOM-safe alphabet (starts with letters, includes numbers and _-)
-    const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     // First character must be a letter (a-zA-Z)
     const firstChar = alphabet[Math.floor(Math.random() * 52)];
 
     // Remaining characters can use full alphabet
     const remaining = Array.from(crypto.getRandomValues(new Uint8Array(length - 1)))
-    .map(n => alphabet[n % alphabet.length]).join('');
+        .map((n) => alphabet[n % alphabet.length])
+        .join("");
 
     return firstChar + remaining;
 }
@@ -61,9 +62,8 @@ export function firstUpperCase(text: string): string {
 export function stripHtml(html: string, ignoredTags: Array<string> = []): string {
     ignoredTags.push(" ");
     const tags = ignoredTags.join("|");
-    return html
-    .replace(new RegExp("<(?!\/?(" + tags + ")\\b)[^<>]+>", "gm"), "")
-    .replace(/([\r\n]+ +)+/gm, ""); // Remove leading spaces and repeated CR/LF
+    // Remove leading spaces and repeated CR/LF
+    return html.replace(new RegExp("<(?!\/?(" + tags + ")\\b)[^<>]+>", "gm"), "").replace(/([\r\n]+ +)+/gm, "");
 }
 
 /**
@@ -181,23 +181,23 @@ export function formatDate(date: Date | string | number, pattern: string): strin
     const ampm = hours24 < 12 ? "AM" : "PM";
 
     return pattern
-    .replace(/yyyy/g, String(year))
-    .replace(/yy/g, String(year).slice(-2))
-    .replace(/MM/g, String(month).padStart(2, "0"))
-    .replace(/M/g, String(month))
-    .replace(/dd/g, String(day).padStart(2, "0"))
-    .replace(/d/g, String(day))
-    .replace(/HH/g, String(hours24).padStart(2, "0"))
-    .replace(/H/g, String(hours24))
-    .replace(/hh/g, String(hours12).padStart(2, "0"))
-    .replace(/h/g, String(hours12))
-    .replace(/mm/g, String(minutes).padStart(2, "0"))
-    .replace(/m/g, String(minutes))
-    .replace(/ss/g, String(seconds).padStart(2, "0"))
-    .replace(/s/g, String(seconds))
-    .replace(/SSS/g, String(milliseconds).padStart(3, "0"))
-    .replace(/S/g, String(milliseconds))
-    .replace(/a/g, ampm);
+        .replace(/yyyy/g, String(year))
+        .replace(/yy/g, String(year).slice(-2))
+        .replace(/MM/g, String(month).padStart(2, "0"))
+        .replace(/M/g, String(month))
+        .replace(/dd/g, String(day).padStart(2, "0"))
+        .replace(/d/g, String(day))
+        .replace(/HH/g, String(hours24).padStart(2, "0"))
+        .replace(/H/g, String(hours24))
+        .replace(/hh/g, String(hours12).padStart(2, "0"))
+        .replace(/h/g, String(hours12))
+        .replace(/mm/g, String(minutes).padStart(2, "0"))
+        .replace(/m/g, String(minutes))
+        .replace(/ss/g, String(seconds).padStart(2, "0"))
+        .replace(/s/g, String(seconds))
+        .replace(/SSS/g, String(milliseconds).padStart(3, "0"))
+        .replace(/S/g, String(milliseconds))
+        .replace(/a/g, ampm);
 }
 
 /**
@@ -210,8 +210,12 @@ export function formatSeconds(seconds: number): string {
     const h = Math.floor((seconds % 86400) / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    return ((d > 0 ? d + "d " : "") + (h > 0 ? h + "h " : "") + (m > 0 ? m + "m " : "")
-        + (s > 0 ? s + "s" : "")).trim();
+    return (
+        (d > 0 ? d + "d " : "") +
+        (h > 0 ? h + "h " : "") +
+        (m > 0 ? m + "m " : "") +
+        (s > 0 ? s + "s" : "")
+    ).trim();
 }
 
 /**
@@ -234,8 +238,8 @@ export function formatDuration(n: number, options?: { leading?: boolean; ms?: bo
         result = (options.leading ? hours.toString().padStart(2, "0") : hours) + ":";
         options.leading = true;
     }
-    result += (options.leading ? minutes.toString().padStart(2, "0") : minutes) +
-        ":" + seconds.toString().padStart(2, "0");
+    result +=
+        (options.leading ? minutes.toString().padStart(2, "0") : minutes) + ":" + seconds.toString().padStart(2, "0");
     if (options.ms) {
         result += "." + ms.toString().padStart(3, "0");
     }
@@ -269,10 +273,7 @@ export function parseDuration(s: string): number {
  * @returns
  */
 export function localeCompare(aStr: string, bStr: string, locale = "zh"): number {
-    const regExp = [
-        /[\s\~\!\@\#\$\%\^\&\*\(\)\-\_\+\=\{\}\[\]\|\<\>\,\.\?\/\\]/,
-        /[0-9]/, /[a-zA-Z]/, /./
-    ];
+    const regExp = [/[\s\~\!\@\#\$\%\^\&\*\(\)\-\_\+\=\{\}\[\]\|\<\>\,\.\?\/\\]/, /[0-9]/, /[a-zA-Z]/, /./];
 
     const length = Math.min(aStr.length, bStr.length);
     for (let i = 0; i < length; i++) {
@@ -280,8 +281,8 @@ export function localeCompare(aStr: string, bStr: string, locale = "zh"): number
         const bChar = bStr.charAt(i);
         if (aChar === bChar) continue;
 
-        const aIndex = regExp.findIndex(v => v.test(aChar));
-        const bIndex = regExp.findIndex(v => v.test(bChar));
+        const aIndex = regExp.findIndex((v) => v.test(aChar));
+        const bIndex = regExp.findIndex((v) => v.test(bChar));
 
         if (aIndex != bIndex) {
             return aIndex - bIndex;
