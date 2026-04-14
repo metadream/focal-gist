@@ -7,6 +7,7 @@
         "./utils": "./utils.ts",
         "./crypto": "./crypto.ts",
         "./paginate": "./paginate.ts",
+        "./stache": "./stache.ts",
         "./expiring-cache": "./expiring-cache.ts",
         "./google-oauth": "./google-oauth.ts",
         "./google-drive": "./google-drive.ts",
