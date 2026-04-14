@@ -6,10 +6,8 @@ const textDecode = (u: Uint8Array) => new TextDecoder().decode(u);
 const importAesKey = async (key: string) => {
     const digest = await crypto.subtle.digest("SHA-1", textEncode(key));
     const rawKey = new Uint8Array(digest).slice(0, 16);
-    return await crypto.subtle.importKey(
-        "raw", rawKey, "AES-CBC", true, ["encrypt", "decrypt"]
-    );
-}
+    return await crypto.subtle.importKey("raw", rawKey, "AES-CBC", true, ["encrypt", "decrypt"]);
+};
 
 /**
  * SHA-1 hash encryption
@@ -31,9 +29,11 @@ export const AES: any = {
     async encrypt(plaintext: string, key: string) {
         const iv = crypto.getRandomValues(new Uint8Array(16));
         const encrypted = await crypto.subtle.encrypt(
-            { name: "AES-CBC", iv }, await importAesKey(key), textEncode(plaintext)
+            { name: "AES-CBC", iv },
+            await importAesKey(key),
+            textEncode(plaintext),
         );
-        return encodeBase64(iv) + '.' + encodeBase64(encrypted);
+        return encodeBase64(iv) + "." + encodeBase64(encrypted);
     },
 
     async decrypt(ciphertext: string, key: string) {
@@ -41,15 +41,16 @@ export const AES: any = {
         const iv = decodeBase64(ciphertext.substring(0, index));
         try {
             const decrypted = await crypto.subtle.decrypt(
-                { name: "AES-CBC", iv }, await importAesKey(key),
-                decodeBase64(ciphertext.substring(index + 1))
+                { name: "AES-CBC", iv },
+                await importAesKey(key),
+                decodeBase64(ciphertext.substring(index + 1)),
             );
             return textDecode(new Uint8Array(decrypted));
         } catch (e) {
             console.error(e);
         }
-    }
-}
+    },
+};
 
 /**
  * RSA encryption and decryption
@@ -58,26 +59,27 @@ export const AES: any = {
  */
 export const RSA: any = {
     async generateKeyPair() {
-        return await crypto.subtle.generateKey({
+        return await crypto.subtle.generateKey(
+            {
                 name: "RSA-OAEP",
                 modulusLength: 2048,
                 publicExponent: new Uint8Array([1, 0, 1]),
                 hash: "SHA-256",
             },
             true,
-            ["encrypt", "decrypt"]
+            ["encrypt", "decrypt"],
         );
     },
 
     async exportPublicKey(key: CryptoKey) {
         const buffer = await crypto.subtle.exportKey("spki", key);
-        const base64 = encodeBase64((new Uint8Array(buffer)));
+        const base64 = encodeBase64(new Uint8Array(buffer));
         return `-----BEGIN PUBLIC KEY-----\n${base64}\n-----END PUBLIC KEY-----`;
     },
 
     async exportPrivateKey(key: CryptoKey) {
         const buffer = await crypto.subtle.exportKey("pkcs8", key);
-        const base64 = encodeBase64((new Uint8Array(buffer)));
+        const base64 = encodeBase64(new Uint8Array(buffer));
         return `-----BEGIN PRIVATE KEY-----\n${base64}\n-----END PRIVATE KEY-----`;
     },
 
@@ -90,7 +92,7 @@ export const RSA: any = {
             decodeBase64(pemContents),
             { name: "RSA-OAEP", hash: "SHA-256" },
             true,
-            ["encrypt"]
+            ["encrypt"],
         );
     },
 
@@ -103,26 +105,20 @@ export const RSA: any = {
             decodeBase64(pemContents),
             { name: "RSA-OAEP", hash: "SHA-256" },
             true,
-            ["decrypt"]
+            ["decrypt"],
         );
     },
 
     async encrypt(plaintext: string, publicKey: CryptoKey) {
-        return encodeBase64(await crypto.subtle.encrypt(
-            { name: "RSA-OAEP" },
-            publicKey,
-            textEncode(plaintext)
-        ));
+        return encodeBase64(await crypto.subtle.encrypt({ name: "RSA-OAEP" }, publicKey, textEncode(plaintext)));
     },
 
     async decrypt(ciphertext: string, privateKey: CryptoKey) {
-        return textDecode((new Uint8Array(await crypto.subtle.decrypt(
-            { name: "RSA-OAEP" },
-            privateKey,
-            decodeBase64(ciphertext)
-        ))));
-    }
-}
+        return textDecode(
+            new Uint8Array(await crypto.subtle.decrypt({ name: "RSA-OAEP" }, privateKey, decodeBase64(ciphertext))),
+        );
+    },
+};
 
 /**
  * JWT encryption and decryption
@@ -137,5 +133,5 @@ export const JWT: any = {
         const payload: Record<string, unknown> = JSON.parse(await RSA.decrypt(jwt, privateKey));
         if (payload.exp && Date.now() > (payload.exp as number)) return;
         return payload;
-    }
-}
+    },
+};
