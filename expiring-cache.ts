@@ -16,16 +16,12 @@
  * ```
  */
 export class ExpiringCache<K, V> {
-
     private cache: Map<K, { value: V; expires: number }>;
     private readonly cleanupInterval: number;
 
     constructor(cleanupIntervalSeconds = 60) {
         this.cache = new Map();
-        this.cleanupInterval = setInterval(
-            () => this.cleanup(),
-            cleanupIntervalSeconds * 1000
-        );
+        this.cleanupInterval = setInterval(() => this.cleanup(), cleanupIntervalSeconds * 1000);
     }
 
     get(key: K): V | undefined {
@@ -67,5 +63,4 @@ export class ExpiringCache<K, V> {
             }
         }
     }
-
 }
