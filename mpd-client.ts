@@ -1,5 +1,5 @@
 import { TextLineStream } from "@std/streams";
-import { localeCompare } from "./util.ts";
+import { localeCompare } from "./utils.ts";
 
 const textEncoder = new TextEncoder();
 

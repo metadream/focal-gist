@@ -1,4 +1,4 @@
-import { localeCompare } from "./util.ts";
+import { localeCompare } from "./utils.ts";
 
 const textDecoder = new TextDecoder();
 

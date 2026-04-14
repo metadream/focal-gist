@@ -1,5 +1,6 @@
-export * from "./util.ts";
+export * from "./utils.ts";
 export * from "./crypto.ts";
+export * from "./paginate.ts";
 export { GoogleDrive } from "./google-drive.ts";
 export { GoogleOAuth } from "./google-oauth.ts";
 export { ExpiringCache } from "./expiring-cache.ts";
