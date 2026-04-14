@@ -105,9 +105,7 @@ export class GoogleDrive {
             // add list() method to metadata
             metadata.list = async () => {
                 const files = await this.listFiles(metadata.id);
-                files.map((item: any) =>
-                    item.isFolder = item.mimeType === FOLDER_TYPE
-                );
+                files.map((item: any) => (item.isFolder = item.mimeType === FOLDER_TYPE));
                 return files;
             };
         } else {
@@ -210,9 +208,7 @@ export class GoogleDrive {
 
             pageToken = result.nextPageToken;
             list.push(...result.files);
-        } while (
-            pageToken
-            );
+        } while (pageToken);
         return list;
     }
 
@@ -227,7 +223,7 @@ export class GoogleDrive {
         const response = await fetch(DRIVE_URL + "?" + this.stringify(params), {
             headers: {
                 Authorization: "Bearer " + this.options.access_token,
-            }
+            },
         });
 
         const result = await response.json();
