@@ -3,7 +3,11 @@ import { localeCompare } from "./util.ts";
 
 const textEncoder = new TextEncoder();
 
-export enum MpdSignal { VERSION = "OK MPD", END = "OK", ERROR = "ACK" }
+export enum MpdSignal {
+    VERSION = "OK MPD",
+    END = "OK",
+    ERROR = "ACK",
+}
 
 export type MpdMessage = Record<string, string | number | boolean | Date>;
 
@@ -34,7 +38,6 @@ export type MpdMessage = Record<string, string | number | boolean | Date>;
  * unsubscribe,update,urlhandlers,volume
  */
 export class MpdClient {
-
     private hostname: string;
     private port: number;
 
@@ -45,22 +48,22 @@ export class MpdClient {
 
     // Get status
     async getStatus(): Promise<MpdMessage> {
-        return await this.sendCommand("status") as MpdMessage;
+        return (await this.sendCommand("status")) as MpdMessage;
     }
 
     // Get current song
     async getCurrentSong(): Promise<MpdMessage> {
-        return await this.sendCommand("currentsong") as MpdMessage;
+        return (await this.sendCommand("currentsong")) as MpdMessage;
     }
 
     // Get playlist
     async getPlaylist(): Promise<MpdMessage[]> {
-        return await this.sendCommand("playlistinfo") as MpdMessage[];
+        return (await this.sendCommand("playlistinfo")) as MpdMessage[];
     }
 
     // Get directories or files in library
     async getLibrary(path: string): Promise<MpdMessage[]> {
-        const list = await this.sendCommand("lsinfo", path) as MpdMessage[];
+        const list = (await this.sendCommand("lsinfo", path)) as MpdMessage[];
         return list.sort((a: MpdMessage, b: MpdMessage) => {
             if (a.isDir && !b.isDir) return -1;
             return localeCompare(a.file as string, b.file as string);
@@ -105,7 +108,7 @@ export class MpdClient {
 
     async addSong(path: string): Promise<void> {
         if (path.indexOf("+") >= 0) {
-            throw new Error("The path cannot contain a \"+\" sign");
+            throw new Error('The path cannot contain a "+" sign');
         }
         await this.sendCommand("add", path);
     }
@@ -129,9 +132,7 @@ export class MpdClient {
         await conn.write(textEncoder.encode(`${commandLine}\n`));
 
         const result = [];
-        const lines = conn.readable
-        .pipeThrough(new TextDecoderStream())
-        .pipeThrough(new TextLineStream());
+        const lines = conn.readable.pipeThrough(new TextDecoderStream()).pipeThrough(new TextLineStream());
 
         // Read stream line by line
         for await (const line of lines) {
@@ -144,7 +145,7 @@ export class MpdClient {
             result.push(line);
         }
 
-        if (command == 'playlistinfo' || command == 'lsinfo') {
+        if (command == "playlistinfo" || command == "lsinfo") {
             return this.parseMessageList(result);
         }
         return this.parseMessageObject(result);
@@ -242,5 +243,4 @@ export class MpdClient {
         const { hostname, port } = this;
         return await Deno.connect({ hostname, port });
     }
-
 }
