@@ -23,14 +23,29 @@ export function uniqueId(length = 21): string {
 }
 
 /**
- * Generate a random number between [a,b]
+ * Generate a random number between [a,b)
  * @param {Number} a
  * @param {Number} b
  * @returns {Number}
  */
 export function randomBetween(a: number, b: number): number {
     b = b > a ? b : a;
-    return Math.floor(Math.random() * (b - a + 1) + a);
+    return Math.floor(Math.random() * (b - a) + a);
+}
+
+/**
+ * Generate a random numbers array between [origin, bound)
+ * @param origin
+ * @param bound
+ * @param size
+ * @returns
+ */
+export function randomArrayBetween(origin: number, bound: number, size: number): number[] {
+    const maxAvailable = Math.max(0, bound - origin);
+    const actualSize = Math.min(size, maxAvailable);
+    const res = new Set<number>();
+    while (res.size < actualSize) res.add(Math.floor(Math.random() * maxAvailable + origin));
+    return [...res];
 }
 
 /**
