@@ -108,11 +108,11 @@ export class IpAddress {
 }
 
 type TopInfo = {
-    systemInfo: SystemInfo,
-    taskInfo: TaskInfo,
-    cpuInfo: CpuInfo,
-    processes: ProcessInfo[]
-}
+    systemInfo: SystemInfo;
+    taskInfo: TaskInfo;
+    cpuInfo: CpuInfo;
+    processes: ProcessInfo[];
+};
 
 /**
  * Operating System Monitor for Linux
@@ -133,7 +133,6 @@ type TopInfo = {
  * ```
  */
 export class OsMonitor {
-
     // Get os info.
     os(): OsInfo {
         const { os, arch } = Deno.build;
@@ -175,9 +174,7 @@ export class OsMonitor {
 
         for (let i = faces.length - 1; i >= 0; i--) {
             const face = faces[i];
-            if (face.name.startsWith("docker") ||
-                face.family === "IPv6" ||
-                face.address === "127.0.0.1") {
+            if (face.name.startsWith("docker") || face.family === "IPv6" || face.address === "127.0.0.1") {
                 faces.splice(i, 1);
             }
         }
@@ -197,16 +194,21 @@ export class OsMonitor {
         systemInfo.timestamp = Date.now();
         systemInfo.uptime = Deno.osUptime();
 
-        const matched = headLines.shift()?.match(/^top - ([\d\:]{8}) up ([\w\s\:,]+),\s+(\d+) users?,\s+load average: ([\d\.]+, [\d\.]+, [\d\.]+)$/);
+        const matched = headLines
+            .shift()
+            ?.match(/^top - ([\d\:]{8}) up ([\w\s\:,]+),\s+(\d+) users?,\s+load average: ([\d\.]+, [\d\.]+, [\d\.]+)$/);
         if (matched) {
             systemInfo.users = parseInt(matched[3]);
-            systemInfo.loadavg = matched[4].split(/, /).map(v => parseFloat(v));
+            systemInfo.loadavg = matched[4].split(/, /).map((v) => parseFloat(v));
         }
 
         // line 2
         // Tasks: 294 total,   2 running, 292 sleeping,   0 stopped,   1 zombie
         const taskInfo = new TaskInfo();
-        const count = headLines.shift()?.replace(/[a-zT:\s]/g, "").split(/,/);
+        const count = headLines
+            .shift()
+            ?.replace(/[a-zT:\s]/g, "")
+            .split(/,/);
         if (count) {
             taskInfo.total = parseInt(count[0]);
             taskInfo.running = parseInt(count[1]);
@@ -218,7 +220,10 @@ export class OsMonitor {
         // line 3
         // %Cpu(s):  0.0 us,  2.1 sy,  0.0 ni, 97.9 id,  0.0 wa,  0.0 hi,  0.0 si,  0.1 st
         const cpuInfo = new CpuInfo();
-        const load = headLines.shift()?.replace(/[a-zC%:()\s]/g, "").split(/,/);
+        const load = headLines
+            .shift()
+            ?.replace(/[a-zC%:()\s]/g, "")
+            .split(/,/);
         if (load) {
             cpuInfo.user = parseFloat(load[0]);
             cpuInfo.system = parseFloat(load[1]);
@@ -263,7 +268,10 @@ export class OsMonitor {
         const lines = stdout.split(/\n+/).slice(1);
 
         const memoryInfo = new MemoryInfo();
-        let item = lines.shift()?.replace(/^Mem:\s+/, "").split(/\s+/);
+        let item = lines
+            .shift()
+            ?.replace(/^Mem:\s+/, "")
+            .split(/\s+/);
         if (item) {
             memoryInfo.total = parseInt(item[0]);
             memoryInfo.used = parseInt(item[1]);
@@ -273,17 +281,20 @@ export class OsMonitor {
             memoryInfo.cache = parseInt(item[5]);
             memoryInfo.available = parseInt(item[6]);
 
-            const usage = (memoryInfo.total - memoryInfo.available) / memoryInfo.total * 100;
+            const usage = ((memoryInfo.total - memoryInfo.available) / memoryInfo.total) * 100;
             memoryInfo.usage = parseFloat(usage.toFixed(1));
         }
 
         const swapInfo = new MemoryInfo();
-        item = lines.shift()?.replace(/^Swap:\s+/, "").split(/\s+/);
+        item = lines
+            .shift()
+            ?.replace(/^Swap:\s+/, "")
+            .split(/\s+/);
         if (item) {
             swapInfo.total = parseInt(item[0]);
             swapInfo.used = parseInt(item[1]);
             swapInfo.free = parseInt(item[2]);
-            swapInfo.usage = parseFloat((swapInfo.used / swapInfo.total * 100).toFixed(1));
+            swapInfo.usage = parseFloat(((swapInfo.used / swapInfo.total) * 100).toFixed(1));
         }
 
         return { memoryInfo, swapInfo };
@@ -398,7 +409,7 @@ export class OsMonitor {
                 rx_packets: parseInt(data[1]),
                 tx_bytes: parseInt(data[8]),
                 tx_packets: parseInt(data[9]),
-            }
+            };
         }
         return result;
     }
@@ -413,5 +424,4 @@ export class OsMonitor {
         if (code !== 0) throw new Error(textDecoder.decode(stderr));
         return textDecoder.decode(stdout);
     }
-
 }
