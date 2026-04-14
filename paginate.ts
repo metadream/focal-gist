@@ -6,7 +6,7 @@
  * @param around 当前页环绕左右最大页码数（默认值 2）
  * @returns
  */
-function calcEllipsisPages(totalPages: number, pageIndex: number, around = 2) {
+function calcEllipsisPages(totalPages: number, pageIndex: number, around = 2): any {
     const baseCount = around * 2 + 5; // 总元素个数：环绕左右页码*2+当前页+省略号*2+首页+末页
     const surplus = baseCount - 2; // 只出现一个省略号时剩余元素个数
     const startIndex = 1 + 2 + around + 1; // 前面出现省略号的临界点
@@ -35,7 +35,18 @@ function calcEllipsisPages(totalPages: number, pageIndex: number, around = 2) {
  * @param pageIndex 当前页码
  * @returns
  */
-export default function paginate(totalSize: number, pageSize: number, pageIndex = 1) {
+export default function paginate(
+    totalSize: number,
+    pageSize: number,
+    pageIndex = 1,
+): {
+    totalSize: number;
+    totalPages: number;
+    ellipsisPages: number[];
+    pageIndex: number;
+    startIndex: number;
+    endIndex: number;
+} {
     const totalPages = Math.ceil(totalSize / pageSize);
     const ellipsisPages = calcEllipsisPages(totalPages, pageIndex);
     const startIndex = pageSize * (pageIndex - 1); // 当前页的记录起始位置
