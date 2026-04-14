@@ -3,25 +3,25 @@ import { localeCompare } from "./util.ts";
 const textDecoder = new TextDecoder();
 
 export type SmbOption = {
-    hostname: string,
-    port?: number,
-    username?: string,
-    password?: string
+    hostname: string;
+    port?: number;
+    username?: string;
+    password?: string;
 };
 
 export type SmbFile = {
-    type: "SHARE" | "DIR" | "FILE",
-    name: string,
-    comment?: string,
-    size?: number,
-    ctime?: Date,
+    type: "SHARE" | "DIR" | "FILE";
+    name: string;
+    comment?: string;
+    size?: number;
+    ctime?: Date;
 };
 
 export type SmbPath = {
-    share: string,
-    dir: string,
-    filename: string,
-}
+    share: string;
+    dir: string;
+    filename: string;
+};
 
 /**
  * Samba Client
@@ -38,9 +38,11 @@ export type SmbPath = {
  * ```
  */
 export class SmbClient {
-
     private smbOption: SmbOption = {
-        hostname: "", port: 445, username: "", password: ""
+        hostname: "",
+        port: 445,
+        username: "",
+        password: "",
     };
 
     constructor(smbOption: SmbOption) {
@@ -53,7 +55,7 @@ export class SmbClient {
 
     readFile(path: string): ReadableStream<Uint8Array> {
         const smbPath: SmbPath = this.parseSmbPath(path);
-        return this.getSmbStream("get \"" + smbPath.filename + "\" -", smbPath);
+        return this.getSmbStream('get "' + smbPath.filename + '" -', smbPath);
     }
 
     readDir(path = ""): SmbFile[] {
@@ -63,6 +65,7 @@ export class SmbClient {
 
     private listShares(): SmbFile[] {
         const cmd = new Deno.Command("smbclient", {
+            // prettier-ignore
             args: [
                 "-gL", this.smbOption.hostname,
                 "-p", this.smbOption.port + "",
@@ -145,6 +148,7 @@ export class SmbClient {
     private exeCommand(command: string, smbPath: SmbPath): Deno.Command {
         return new Deno.Command("smbclient", {
             stdout: "piped",
+            // prettier-ignore
             args: [
                 "//" + this.smbOption.hostname + "/" + smbPath.share,
                 "-p", this.smbOption.port + "",
@@ -155,5 +159,4 @@ export class SmbClient {
             ],
         });
     }
-
 }
