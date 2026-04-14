@@ -1,25 +1,24 @@
 import { decodeBase64Url } from "@std/encoding";
 import { JWT } from "./crypto.ts";
 
-const OAUTH_URL = 'https://accounts.google.com/o/oauth2';
-const TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token';
-const CERTS_URL = 'https://www.googleapis.com/oauth2/v1/certs';
+const OAUTH_URL = "https://accounts.google.com/o/oauth2";
+const TOKEN_URL = "https://www.googleapis.com/oauth2/v4/token";
+const CERTS_URL = "https://www.googleapis.com/oauth2/v1/certs";
 
 const textDecode = (u: Uint8Array) => new TextDecoder().decode(u);
 
 type Options = {
-    client_id: string,
-    client_secret: string,
-    redirect_uri: string,
-    scopes: string[],
-}
+    client_id: string;
+    client_secret: string;
+    redirect_uri: string;
+    scopes: string[];
+};
 
 /**
  * Google OAuth2 authorization,
  * its purpose is to get refresh_token
  */
 export class GoogleOAuth {
-
     #options: Options;
 
     /**
@@ -38,13 +37,17 @@ export class GoogleOAuth {
      * @returns string
      */
     buildAuthLink(): string {
-        return OAUTH_URL + "/auth?" + this.#stringify({
-            client_id: this.#options.client_id,
-            redirect_uri: this.#options.redirect_uri,
-            scope: this.#options.scopes.join(' '),
-            response_type: 'code',
-            access_type: 'offline', // 'online' (default) or 'offline' (gets refresh_token)
-        });
+        return (
+            OAUTH_URL +
+            "/auth?" +
+            this.#stringify({
+                client_id: this.#options.client_id,
+                redirect_uri: this.#options.redirect_uri,
+                scope: this.#options.scopes.join(" "),
+                response_type: "code",
+                access_type: "offline", // 'online' (default) or 'offline' (gets refresh_token)
+            })
+        );
     }
 
     /**
@@ -55,16 +58,16 @@ export class GoogleOAuth {
      * @returns object { refresh_token, access_token, id_token... }
      */
     async getTokens(code: string): Promise<unknown> {
-        const response = await fetch(OAUTH_URL + '/token', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        const response = await fetch(OAUTH_URL + "/token", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: this.#stringify({
                 code: code,
                 client_id: this.#options.client_id,
                 client_secret: this.#options.client_secret,
                 redirect_uri: this.#options.redirect_uri,
-                grant_type: 'authorization_code'
-            })
+                grant_type: "authorization_code",
+            }),
         });
         const result = await response.json();
         if (result.error) {
@@ -82,14 +85,14 @@ export class GoogleOAuth {
      */
     async getAccessToken(refresh_token: string): Promise<unknown> {
         const response = await fetch(TOKEN_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: this.#stringify({
                 client_id: this.#options.client_id,
                 client_secret: this.#options.client_secret,
                 refresh_token: refresh_token,
-                grant_type: 'refresh_token'
-            })
+                grant_type: "refresh_token",
+            }),
         });
         const result = await response.json();
         if (result.error) {
@@ -110,15 +113,15 @@ export class GoogleOAuth {
         if (!token) {
             throw { status: 400, message: "Undefined token" };
         }
-        const segments = token.split('.');
+        const segments = token.split(".");
         if (segments.length !== 3) {
             throw { status: 400, message: "Not enough or too many segment" };
         }
         return {
             header: JSON.parse(textDecode(decodeBase64Url(segments[0]))),
             payload: JSON.parse(textDecode(decodeBase64Url(segments[1]))), // email, sub...
-            signature: segments[2]
-        }
+            signature: segments[2],
+        };
     }
 
     /**
@@ -153,5 +156,4 @@ export class GoogleOAuth {
         }
         return qs.join("&");
     }
-
 }
