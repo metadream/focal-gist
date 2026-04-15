@@ -41,8 +41,8 @@ export default function paginate(totalSize: number, pageSize: number, pageNumber
         throw new Error(`Page number is out of range (1-${totalPages})`);
     }
     const ellipsisPages = calcEllipsisPages(totalPages, pageNumber);
-    const start = pageSize * (pageNumber - 1); // 当前页的记录起始位置
+    const begin = pageSize * (pageNumber - 1); // 当前页的记录起始位置
     const end = Math.min(pageSize * pageNumber, totalSize); // 当前页的记录结束位置
-    const limit = end - start;
-    return { totalSize, totalPages, ellipsisPages, pageNumber, start, end, limit };
+    const limit = end - begin;
+    return { totalSize, totalPages, ellipsisPages, pageNumber, begin, end, limit };
 }
