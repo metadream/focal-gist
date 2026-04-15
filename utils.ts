@@ -4,22 +4,17 @@
  * - Are highly collision-resistant
  * - Work in all modern browsers
  *
- * @param {Number} length Desired ID length (default: 21)
- * @returns {String} A DOM-safe unique ID starting with a letter
+ * @param length Desired ID length (default: 21)
+ * @returns A DOM-safe unique ID starting with a letter
  */
-export function uniqueId(length = 21): string {
-    // DOM-safe alphabet (starts with letters, includes numbers and _-)
+export function uid(size = 21): string {
     const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-    // First character must be a letter (a-zA-Z)
-    const firstChar = alphabet[Math.floor(Math.random() * 52)];
-
-    // Remaining characters can use full alphabet
-    const remaining = Array.from(crypto.getRandomValues(new Uint8Array(length - 1)))
-        .map((n) => alphabet[n % alphabet.length])
-        .join("");
-
-    return firstChar + remaining;
+    const bytes = crypto.getRandomValues(new Uint8Array(size));
+    let id = alphabet[bytes[0] % 52];
+    for (let i = 1; i < size; i++) {
+        id += alphabet[bytes[i] % alphabet.length];
+    }
+    return id;
 }
 
 /**
@@ -28,7 +23,7 @@ export function uniqueId(length = 21): string {
  * @param {Number} b
  * @returns {Number}
  */
-export function randomBetween(a: number, b: number): number {
+export function randomInt(a: number, b: number): number {
     b = b > a ? b : a;
     return Math.floor(Math.random() * (b - a) + a);
 }
@@ -40,7 +35,7 @@ export function randomBetween(a: number, b: number): number {
  * @param size
  * @returns
  */
-export function randomArrayBetween(origin: number, bound: number, size: number): number[] {
+export function randomSample(origin: number, bound: number, size: number): number[] {
     const maxAvailable = Math.max(0, bound - origin);
     const actualSize = Math.min(size, maxAvailable);
     const res = new Set<number>();
