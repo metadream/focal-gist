@@ -3,17 +3,7 @@
     "version": "0.1.2",
     "license": "MIT",
     "exports": {
-        ".": "./mod.ts",
-        "./utils": "./utils.ts",
-        "./crypto": "./crypto.ts",
-        "./paginate": "./paginate.ts",
-        "./stache": "./stache.ts",
-        "./expiring-cache": "./expiring-cache.ts",
-        "./google-oauth": "./google-oauth.ts",
-        "./google-drive": "./google-drive.ts",
-        "./os-monitor": "./os-monitor.ts",
-        "./smb-cliente": "./smb-client.ts",
-        "./mpd-client": "./mpd-client.ts"
+        ".": "./mod.ts"
     },
     "imports": {
         "@std/encoding": "jsr:@std/encoding@^1.0.10",
