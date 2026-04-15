@@ -46,5 +46,3 @@ export default function paginate(totalSize: number, pageSize: number, pageNumber
     const limit = end - begin;
     return { totalSize, totalPages, compactPages, pageNumber, begin, end, limit };
 }
-
-console.log(paginate(200, 10, 8));
