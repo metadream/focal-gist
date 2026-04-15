@@ -7,7 +7,7 @@
  * @param length Desired ID length (default: 21)
  * @returns A DOM-safe unique ID starting with a letter
  */
-export function uid(size = 21): string {
+export function nanoid(size = 21): string {
     const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     const bytes = crypto.getRandomValues(new Uint8Array(size));
     let id = alphabet[bytes[0] % 52];
