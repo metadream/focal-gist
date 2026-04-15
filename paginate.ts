@@ -28,6 +28,18 @@ function compact(totalPages: number, pageNumber: number, around = 2): number[] {
     return [1, 0, ...Array.from({ length: around * 2 + 1 }, (_, i) => pageNumber - around + i), 0, totalPages];
 }
 
+/** 分页结果 */
+export interface Paging {
+    totalSize: number;
+    totalPages: number;
+    compactPages: number[];
+    pageNumber: number;
+    begin: number;
+    end: number;
+    limit: number;
+    results?: any[];
+}
+
 /**
  * 分页助手
  * @param totalSize 总记录数
@@ -35,7 +47,7 @@ function compact(totalPages: number, pageNumber: number, around = 2): number[] {
  * @param pageNumber 当前页码
  * @returns
  */
-export default function paginate(totalSize: number, pageSize: number, pageNumber = 1) {
+export function paginate(totalSize: number, pageSize: number, pageNumber = 1): Paging {
     const totalPages = Math.ceil(totalSize / pageSize);
     if (pageNumber < 1 || pageNumber > totalPages) {
         throw new Error(`Page number is out of range (1-${totalPages})`);

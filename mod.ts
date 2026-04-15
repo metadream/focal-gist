@@ -1,6 +1,6 @@
 export * from "./utils.ts";
 export * from "./crypto.ts";
-export { default as paginate } from "./paginate.ts";
+export * from "./paginate.ts";
 export { Stache } from "./stache.ts";
 export { GoogleDrive } from "./google-drive.ts";
 export { GoogleOAuth } from "./google-oauth.ts";
