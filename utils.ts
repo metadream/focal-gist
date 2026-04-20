@@ -5,14 +5,17 @@
  * - Work in all modern browsers
  *
  * @param length Desired ID length (default: 21)
+ * @param alphabet Optional custom alphabet string (default: BASE62)
  * @returns A DOM-safe unique ID starting with a letter
  */
-export function nanoid(size = 21): string {
-    const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+export function nanoid(size = 21, alphabet?: string): string {
+    const chars = alphabet ?? "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     const bytes = crypto.getRandomValues(new Uint8Array(size));
-    let id = alphabet[bytes[0] % 52];
+
+    // 使用默认 BASE62 时，%52 确保首字符是字母
+    let id = alphabet ? chars[bytes[0] % chars.length] : chars[bytes[0] % 52];
     for (let i = 1; i < size; i++) {
-        id += alphabet[bytes[i] % alphabet.length];
+        id += chars[bytes[i] % chars.length];
     }
     return id;
 }
@@ -148,7 +151,7 @@ export function formatBytes(bytes: number): string {
     const unit = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB"];
     const base = Math.min(unit.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
     const scale = Math.max(0, base - 2);
-    return parseFloat((bytes / Math.pow(1024, base)).toFixed(scale)) + unit[base];
+    return parseFloat((bytes / Math.pow(1024, base)).toFixed(scale)) + " " + unit[base];
 }
 
 /**
