@@ -1,3 +1,5 @@
+import { normalize } from "path";
+
 /**
  * Generates DOM-safe unique IDs that:
  * - Never start with a number (complies with HTML4 spec)
@@ -18,6 +20,42 @@ export function nanoid(size = 21, alphabet?: string): string {
         id += chars[bytes[i] % chars.length];
     }
     return id;
+}
+
+/** 路径归一化 */
+export function normalizePath(path: string): string {
+    return normalize(path)
+        .replace(/\\/g, "/") // 1. 所有反斜杠转正
+        .replace(/\/+/g, "/") // 2. 全局去重（将多个连续的 / 变为一个 /）
+        .replace(/^\//, ""); // 3. 去掉开头的第一个 /
+}
+
+/** 校验是否合法的文件路径 */
+export function isValidPath(path: string): boolean {
+    // 1. 基础校验：不能为空，长度不能超过常见限制 (255)
+    if (!path || path.trim() === "" || path.length > 255) return false;
+
+    // 2. 跨平台禁用字符集 (包含 Windows 的所有禁符)
+    // <>:"/\|?* 以及 ASCII 控制字符 (0-31)
+    // 注意：我们这里保留 \ 和 / 作为路径分隔符，只校验文件名部分
+    const illegalChars = /[<>:"|?*\x00-\x1F]/;
+
+    // 3. 拆分路径，检查每一级目录或文件名
+    const parts = path.split(/[\\/]/).filter(Boolean);
+
+    for (const part of parts) {
+        // 校验非法字符
+        if (illegalChars.test(part)) return false;
+
+        // 4. 校验 Windows 保留设备名 (即使在 Linux 上运行也禁用它们以保兼容)
+        // 比如 CON.txt, lpt1.png 等
+        const reservedNames = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\..*)?$/i;
+        if (reservedNames.test(part)) return false;
+
+        // 5. 校验结尾是否有空格或点 (Windows 无法正常处理结尾是空格或点的文件夹)
+        if (part.endsWith(" ") || part.endsWith(".")) return false;
+    }
+    return true;
 }
 
 /**
